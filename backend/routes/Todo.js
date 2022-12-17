@@ -31,14 +31,14 @@ router.post('/add', async (req,res)=>{
         res.status(500).send({error:error})
     }
 })
-router.put('/update/:id', async (req,res)=>{
+router.post('/update/:id', async (req,res)=>{
     try {
         var update = {}
         for (const key in req.body) {
                 update= {...update, [key]:req.body[key]}
             }
         const connection = await mongoConnection('ToDoList')
-        await connection.collection('Todo').updateOne({_id: ObjectId(req.params.id)},{update})
+        await connection.collection('Todo').updateOne({_id: ObjectId(req.params.id)},{$set:update})
         res.status(200).send({message:"success"})
     } catch (error) {
         res.status(500).send({error:error})

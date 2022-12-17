@@ -27,7 +27,7 @@
 	import { onMount } from "svelte";
 	
 	interface TodosFields{
-		id : string,
+		_id : string,
 		todo : string,
 		done : boolean,
 		inputField: any,
@@ -64,7 +64,7 @@
 			})
 		})
 		let result = await res.json()
-		Todos = [...Todos, {id:result,todo:todo,done:false,inputField:null,deleteButton:null,editButton:null}];
+		Todos = [...Todos, {_id:result,todo:todo,done:false,inputField:null,deleteButton:null,editButton:null}];
 		todo = '';
 	}
 	const deleteTodo = async (e : any):Promise<void> =>{
@@ -73,7 +73,7 @@
 			Todos = [];
 		}
 		Todos = Todos.filter((t) => t.deleteButton !== e.target);
-		let id : any = deletedTodo[0].id;
+		let id : any = deletedTodo[0]._id;
 		await fetch(`http://localhost:4545/todo/delete/${id['id']}`,{
 			method:'DELETE',
 			mode: 'cors',
@@ -89,11 +89,10 @@
 	}
 
 	const disableEditing = async (e: any):Promise<void>=>{
-		let index : number = Todos.findIndex((t) => t.inputField==e.target);
+		let index : number = Todos.findIndex((t) => t.inputField===e.target);
 		Todos[index].inputField.disabled = true;
-		let id : any = Todos[index].id
-		await fetch(`http://localhost:4545/todo/update/${id['id']}`,{
-			method:'PUT',
+		await fetch(`http://localhost:4545/todo/update/${Todos[index]._id}`,{
+			method:'POST',
 			mode: 'cors',
 			 headers:{
 				'Content-Type':'application/json'
@@ -106,7 +105,7 @@
 	const changeDone = async (e:any):Promise<void>=>{
 		let index : number = Todos.findIndex((t) => t.inputField==e.target);
 		Todos[index].inputField.disabled = true;
-		await fetch(`http://localhost:4545/todo/update/${Todos[index].id}`,{
+		await fetch(`http://localhost:4545/todo/update/${Todos[index]._id}`,{
 			method:'PUT',
 			mode: 'cors',
 			 headers:{
