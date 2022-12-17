@@ -32,7 +32,8 @@
 		done : boolean,
 		inputField: any,
 		deleteButton: any,
-		editButton: any
+		editButton: any,
+		checkbox: any
 	}
 	let Todos : TodosFields[] =[];
 	onMount(async () => {
@@ -64,7 +65,7 @@
 			})
 		})
 		let result = await res.json()
-		Todos = [...Todos, {_id:result,todo:todo,done:false,inputField:null,deleteButton:null,editButton:null}];
+		Todos = [...Todos, {_id:result,todo:todo,done:false,inputField:null,deleteButton:null,editButton:null,checkbox:null}];
 		todo = '';
 	}
 	const deleteTodo = async (e : any):Promise<void> =>{
@@ -73,8 +74,7 @@
 			Todos = [];
 		}
 		Todos = Todos.filter((t) => t.deleteButton !== e.target);
-		let id : any = deletedTodo[0]._id;
-		await fetch(`http://localhost:4545/todo/delete/${id['id']}`,{
+		await fetch(`http://localhost:4545/todo/delete/${deletedTodo[0]._id}`,{
 			method:'DELETE',
 			mode: 'cors',
 			headers:{
@@ -103,10 +103,11 @@
 		})
 	}
 	const changeDone = async (e:any):Promise<void>=>{
-		let index : number = Todos.findIndex((t) => t.inputField==e.target);
-		Todos[index].inputField.disabled = true;
+		let index : number = Todos.findIndex((t) => t.checkbox===e.target);
+		e.target.checked = !Todos[index].done;
+		Todos[index].done = !Todos[index].done;
 		await fetch(`http://localhost:4545/todo/update/${Todos[index]._id}`,{
-			method:'PUT',
+			method:'POST',
 			mode: 'cors',
 			 headers:{
 				'Content-Type':'application/json'
@@ -129,7 +130,7 @@
 	{#each Todos as todo}
 		<div class="flex h-full m-2 p-2">
 			<div class="flex items-center m-2 w-3/4">
-				<input class="h-2/3 w-1/12" type="checkbox" on:click={changeDone} bind:checked={todo.done}>
+				<input class="h-2/3 w-1/12" type="checkbox" on:click={changeDone} bind:this={todo.checkbox} bind:checked={todo.done}>
 				<input class="h-2/3 border-solid w-full border-2" on:focusout={disableEditing} type="text" bind:value={todo.todo} bind:this={todo.inputField} disabled>
 			</div>
 			<div class="flex justify-left w-1/4">

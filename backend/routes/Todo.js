@@ -47,8 +47,7 @@ router.post('/update/:id', async (req,res)=>{
 router.delete('/delete/:id', async (req,res)=>{
     try {
         const connection = await mongoConnection('ToDoList')
-        console.log(req.params.id);
-        const a =  (await connection.collection('Todo').deleteOne({_id: ObjectId(req.params.id)})).deletedCount
+        await connection.collection('Todo').deleteOne({_id: ObjectId(req.params.id)})
         res.status(200).send({message:"success"})
     } catch (error) {
         res.status(500).send({error:error})
