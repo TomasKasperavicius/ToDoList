@@ -25,7 +25,7 @@ router.post('/add', async (req,res)=>{
         }
         const connection = await mongoConnection('ToDoList')
         const insertedTodo = await connection.collection('Todo').insertOne(todo)
-        res.status(200).send({id:insertedTodo.insertedId})
+        res.status(200).send({_id:insertedTodo.insertedId})
     } catch (error) {
         console.log(error);
         res.status(500).send({error:error})
