@@ -24,7 +24,7 @@
 <script lang="ts">
 	// import deleteIcon from '$lib/images/deleteIcon.jfif';
 	// import editIcon from '$lib/images/editIcon.jfif';
-	import { onMount } from "svelte";
+	//import { onMount } from "svelte";
 	
 	interface TodosFields{
 		_id : string,
@@ -35,17 +35,17 @@
 		editButton: any,
 		checkbox: any
 	}
-	let Todos : TodosFields[] =[];
-	onMount(async () => {
-		let res = await fetch('http://localhost:4545/todo/all',{
-			method:'GET',
-			mode: 'cors',
- 			headers:{
-				'Content-Type':'application/json'
-			}
-	})
-     Todos = await res.json();
-  	})
+	export let Todos : TodosFields[] =[];
+	// onMount(async () => {
+	// 	let res = await fetch('http://localhost:4545/todo/all',{
+	// 		method:'GET',
+	// 		mode: 'cors',
+ 	// 		headers:{
+	// 			'Content-Type':'application/json'
+	// 		}
+	// })
+    //  Todos = await res.json();
+  	// })
 
   
 	let todo : string = '';
@@ -70,12 +70,13 @@
 	}
 	//po pirmo deleto paskutinis todo netenka buttons bindu
 	const deleteTodo = async (e : any):Promise<void> =>{
-		let deletedTodo : any =  [...Todos.filter((t) => t.deleteButton == e.target)];
+		let deletedTodo : any =  Todos.filter((t) => t.deleteButton === e.target);
+		
 		if (Todos.length == 1) {
 			Todos = [];
 		}
 		else{
-			Todos = Todos.filter((t) => t.deleteButton != e.target);
+			Todos = Todos.filter((t) => t.deleteButton !== e.target);
 		}
 		await fetch(`http://localhost:4545/todo/delete/${deletedTodo[0]._id}`,{
 		method:'DELETE',
@@ -124,16 +125,16 @@
 
 <div class="flex-col text-center w-full">
 	<div class="p-4">
-		<input type="text" bind:value={todo} title="Add todo" placeholder="Add" label="todo" class="border-solid border-2">
+		<input type="text" bind:value={todo} title="Addtodo" placeholder="Add" label="todo" class="border-solid border-2">
 		<button type="button" on:click={addTodo} class="border-solid border-2">
 			Add todo
 		</button>
 	</div>
-	{#each Todos as todo}
+	{#each Todos as todo, id (todo._id)}
 		<div class="flex h-full m-2 p-2">
 			<div class="flex items-center m-2 w-3/4">
-					<input class="h-2/3 w-1/12" title="Done" placeholder="Empty" label="done" type="checkbox" on:change={changeDone}  bind:checked={todo.done} bind:this={todo.checkbox}>
-					<input class="h-2/3 border-solid w-full border-2" title="Added todo" placeholder="Empty" label="addedtodo" on:focusout={disableEditing} type="text" bind:value={todo.todo} bind:this={todo.inputField} disabled>
+					<input class="h-2/3 w-1/12" title="Done" placeholder="Empty" label="Done" type="checkbox" on:change={changeDone}  bind:checked={todo.done} bind:this={todo.checkbox}>
+					<input class="h-2/3 border-solid w-full border-2" title="Addedtodo" placeholder="Empty" label="addedtodo" on:focusout={disableEditing} type="text" bind:value={todo.todo} bind:this={todo.inputField} disabled>
 			</div>
 			<div class="flex justify-left w-1/4">
 				<button on:click={deleteTodo} bind:this={todo.deleteButton} class="border-solid border-2 m-4 w-1/6">
@@ -145,6 +146,10 @@
 					<!-- <img class="w-full h-full" src={editIcon} alt="edit" > -->
 				</button>
 			</div>
+		</div>
+		{:else}
+		<div>
+			No to does...
 		</div>
 	{/each}
 </div>
